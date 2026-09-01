@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>System Update</title>
+    <style>
+        /* Estilo Geral - Terminal Moderno */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000;
+            color: #00FF00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        #gatilho-tela-cheia {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            z-index: 100000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .piscar-texto {
+            color: #00FF00;
+            font-size: 16px;
+            font-weight: bold;
+            animation: piscar 1.2s infinite;
+        }
+
+        @keyframes piscar {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        #terminal {
+            display: none;
+            padding: 20px;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        /* OVERLAY PREMIUM: Fundo blur fosco igual transição do Android */
+        #android-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* CAIXA MATERIAL YOU (Android 14/15) - Zero cara de PC */
+        .android-dialog {
+            background-color: #1c1b1f; /* Cor oficial dark mode do Google */
+            width: 88%;
+            max-width: 312px;
+            border-radius: 28px; /* Cantos super arredondados do Android moderno */
+            padding: 24px;
+            box-sizing: border-box;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0px 4px 30px rgba(0, 0, 0, 0.5);
+            animation: popupAndroid 0.2s cubic-bezier(0, 0, 0.2, 1);
+        }
+
+        @keyframes popupAndroid {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .dialog-title {
+            color: #ffb4ab; /* Vermelho pastel suave do Material Design para erros */
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        .dialog-content {
+            color: #e6e1e5; /* Branco acinzentado do Android */
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 24px;
+            letter-spacing: 0.25px;
+        }
+
+        .dialog-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Botão estilizado em pílula limpa e moderna */
+        .dialog-button {
+            background: none;
+            border: none;
+            color: #d0bcff; /* Roxo/Azul padrão de botões Android Dark */
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: none;
+            padding: 10px 24px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: background 0.2s;
+        }
+
+        .dialog-button:active {
+            background-color: rgba(208, 188, 255, 0.12); /* Efeito de toque do Android */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="gatilho-tela-cheia" onclick="forcarTelaCheia()">
+        <div class="piscar-texto">> TOQUE PARA INICIAR VERIFICAÇÃO <</div>
+    </div>
+
+    <div id="terminal">========================================
+ ERROR 404
+========================================
+</div>
+
+    <div id="android-screen">
+        <div class="android-dialog">
+            <div class="dialog-title">Android System</div>
+            <div class="dialog-content">CRITICAL ERROR:<br>System is corrupted.<br><br>Please reinstall your device for computer or pendrive in format ntfs.</div>
+            <div class="dialog-actions">
+                <button class="dialog-button" onclick="revelarPegadinha()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        const androidScreen = document.getElementById('android-screen');
+        const gatilho = document.getElementById('gatilho-tela-cheia');
+
+        function forcarTelaCheia() {
+            const docElm = document.documentElement;
+            if (docElm.requestFullscreen) {
+                docElm.requestFullscreen();
+            } else if (docElm.webkitRequestFullscreen) {
+                docElm.webkitRequestFullscreen();
+            }
+
+            gatilho.style.display = "none";
+            terminal.style.display = "block";
+            rodarPegadinha();
+        }
+
+        function printTerminal(texto, delay) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    terminal.innerText += texto + "\n";
+                    terminal.scrollTop = terminal.scrollHeight;
+                    resolve();
+                }, delay);
+            });
+        }
+
+        function carregarEfeito(texto) {
+            return new Promise(async (resolve) => {
+                terminal.innerText += texto;
+                for (let i = 0; i < 6; i++) {
+                    await new Promise(r => setTimeout(r, 250));
+                    terminal.innerText += ".";
+                }
+                terminal.innerText += "\n";
+                resolve();
+            });
+        }
+
+        async function rodarPegadinha() {
+            await new Promise(r => setTimeout(r, 500));
+            
+            await carregarEfeito("Conectando ao servidor remoto");
+            await carregarEfeito("Injetando script 'ai_tweker_virus.rar'");
+            await carregarEfeito("Acessando galeria e contatos");
+
+            await printTerminal("\n[ALERTA] ARQUIVOS CRÍTICOS SENDO APAGADOS:", 500);
+            
+            let arquivos = ["System one ui 8.5", "Fotos_Secretas", "Mensagens_Whatsapp", "Pasta_Root"];
+            for (let arq of arquivos) {
+                await printTerminal(` -> Deletando: ${arq}... [SUCESSO]`, 800);
+            }
+
+            await printTerminal("\n----------------------------------------", 400);
+            await printTerminal("[INFO] Initializing exploit payload...", 200);
+            await printTerminal("[SUCCESS] Root access granted (su_auth_bypass)", 200);
+            await printTerminal("[CONNECT] Hijacking Android hardware layers...", 200);
+            await printTerminal("[KERNEL] Overwriting bootloader partitions...", 200);
+            await printTerminal("[DUMP] Stealing encryption tokens: 0x7FFF4A2B", 200);
+            await printTerminal("[CRITICAL] System UI thread blocked by intruder", 200);
+            await printTerminal("[FATAL] Android OS kernel panic triggered!", 200);
+            await printTerminal("----------------------------------------\n", 200);
+
+            setTimeout(() => {
+                androidScreen.style.display = "flex";
+            }, 1000);
+        }
+
+        function revelarPegadinha() {
+            androidScreen.style.display = "none";
+            terminal.style.color = "#FFF"; 
+            printTerminal("\n========================================", 10);
+            printTerminal("   apagando sistema ", 20);
+            printTerminal("   todos arquivos injetados.   ", 30);
+            printTerminal("========================================", 40);
+
+            setTimeout(() => {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
